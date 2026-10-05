@@ -1,0 +1,41 @@
+# HCDD 412 Week 7 - one definition, many environments
+name: hcdd412
+
+services:
+  web:
+    image: nginx:1.27-alpine
+    ports:
+      - "${WEB_PORT:?WEB_PORT is required}:80"
+    mem_limit: ${WEB_MEMORY:-128m}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    labels:
+      app: hcdd412
+      env: ${ENV_NAME:?ENV_NAME is required}
+      managed-by: compose
+    networks:
+      - appnet
+
+  ai:
+    image: ollama/ollama:latest
+    ports:
+      - "${AI_PORT:?AI_PORT is required}:11434"
+    volumes:
+      - models:/root/.ollama
+    restart: unless-stopped
+    labels:
+      app: hcdd412
+      env: ${ENV_NAME}
+      managed-by: compose
+    networks:
+      - appnet
+
+networks:
+  appnet: {}
+
+volumes:
+  models: {}
