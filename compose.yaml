@@ -21,7 +21,7 @@ services:
       - appnet
 
   ai:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.12.3
     ports:
       - "${AI_PORT:?AI_PORT is required}:11434"
     volumes:
@@ -29,7 +29,7 @@ services:
     restart: unless-stopped
     labels:
       app: hcdd412
-      env: ${ENV_NAME}
+      env: ${ENV_NAME:?ENV_NAME is required}
       managed-by: compose
     networks:
       - appnet
