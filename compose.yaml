@@ -2,40 +2,56 @@
 name: hcdd412
 
 services:
+  # Web service
   web:
     image: nginx:1.27-alpine
     ports:
       - "${WEB_PORT:?WEB_PORT is required}:80"
+
+    # Memory is controlled by the environment file
     mem_limit: ${WEB_MEMORY:-128m}
+
     restart: unless-stopped
+
+    # Checks whether nginx is responding
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/"]
       interval: 10s
       timeout: 3s
       retries: 3
+
     labels:
       app: hcdd412
       env: ${ENV_NAME:?ENV_NAME is required}
       managed-by: compose
+
     networks:
       - appnet
 
+  # Local AI service
   ai:
     image: ollama/ollama:0.12.3
     ports:
       - "${AI_PORT:?AI_PORT is required}:11434"
+
+    # Stores Ollama models outside the container
     volumes:
       - models:/root/.ollama
+
     restart: unless-stopped
+
     labels:
       app: hcdd412
       env: ${ENV_NAME:?ENV_NAME is required}
       managed-by: compose
+
     networks:
       - appnet
 
+# Shared network for both services
 networks:
   appnet: {}
 
+# Persistent storage for Ollama models
 volumes:
   models: {}
