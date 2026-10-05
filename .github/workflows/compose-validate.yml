@@ -1,0 +1,11 @@
+name: compose-validate
+
+on: [pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose -p hcdd412-dev --env-file dev.env config -q
+      - run: docker compose -p hcdd412-staging --env-file staging.env config -q
